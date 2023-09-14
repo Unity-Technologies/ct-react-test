@@ -1,6 +1,7 @@
 import { apiRoot } from '../commercetools';
 import { getCart, getCustomer, getCartById } from './cart-util';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 // Fetch cart from commercetools, expanding all discount references for display purposes
 
@@ -8,6 +9,11 @@ const queryArgs = {expand: [
     'lineItems[*].discountedPricePerQuantity[*].discountedPrice.includedDiscounts[*].discount',
     'lineItems[*].price.discounted.discount',
   ]};
+
+export const fetchGenesisUser = async (genesisUserId) => {
+  const genesisUser = await axios.get(`${process.env.REACT_APP_URL_APP}/api/genesis-org/${genesisUserId}`);
+  return genesisUser.data;
+}
 
 export const createPayment = async(cartId, paymentParams) => {
   if(!cartId)
@@ -57,11 +63,12 @@ export const createPayment = async(cartId, paymentParams) => {
 export const addPaymentToCart = async(payment) => {
   let cart = await getCart();
   let customer = await getCustomer();
-  console.log("customer", customer)
-  if(!cart || !customer || customer.shippingAddressIds.length==0 || customer.billingAddressIds.length==0)
+  const genesisUser = await fetchGenesisUser(process.env.REACT_APP_SELECTED_ORG_ID);
+  console.log("customer", genesisUser, customer)
+  if(!cart || !genesisUser || genesisUser.addressList.length==0 || customer.billingAddressIds.length==0)
     return;
   
-  const shippingAddressId = customer.defaultShippingAddressId ? customer.defaultShippingAddressId : customer.shippingAddressIds[0];
+  const shippingAddressId = genesisUser.addressList[0].id;
   const billingAddressId = customer.defaultBillingAddressId ? customer.defaultBillingAddressId : customer.billingAddressIds[0];
   let actions;
   if(process.env.REACT_APP_AVALARA_READY === "true") {
@@ -75,15 +82,15 @@ export const addPaymentToCart = async(payment) => {
     {
       action: 'setShippingAddress',
       address: {
-        country: customer.addresses.find((address) => address.id === shippingAddressId)?.country,
-        city: customer.addresses.find((address) => address.id === shippingAddressId)?.city,
-        state: customer.addresses.find((address) => address.id === shippingAddressId)?.state,
-        firstName: customer.addresses.find((address) => address.id === shippingAddressId)?.firstName,
-        lastName: customer.addresses.find((address) => address.id === shippingAddressId)?.lastName,
-        streetName: customer.addresses.find((address) => address.id === shippingAddressId)?.streetName,
-        streetNumber: customer.addresses.find((address) => address.id === shippingAddressId)?.streetNumber,
-        postalCode: customer.addresses.find((address) => address.id === shippingAddressId)?.postalCode,
-        email: customer.addresses.find((address) => address.id === shippingAddressId)?.email,
+        country: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.country,
+        city: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.locality,
+        state: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.region,
+        firstName: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.firstName,
+        lastName: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.lastName,
+        streetName: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.streetAddress,
+        //streetNumber: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.streetNumber,
+        postalCode: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.postalCode,
+        email: genesisUser.addressList.find((address) => address.id === shippingAddressId)?.email,
 
       }
     },

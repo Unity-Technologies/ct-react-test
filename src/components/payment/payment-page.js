@@ -1,6 +1,5 @@
 // @ts-check
 
-import axios from 'axios';
 import React, { Component, useState } from "react";
 import { withRouter } from "react-router";
 import { useRef, useEffect } from 'react';
@@ -11,7 +10,6 @@ import '@adyen/adyen-web/dist/adyen.css';
 import { createPayment, addPaymentToCart, createSessionRequest, checkPayment, createOrder, removePaymentToCart } from '../../util/payment-util';
 import { Col, Container, Row } from 'react-bootstrap';
 
-const URL_APP = 'http://localhost:3001';
 
 
 const AdyenForm = props => {

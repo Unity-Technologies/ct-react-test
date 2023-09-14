@@ -1,4 +1,5 @@
 require('dotenv').config(); // Load environment variables from .env file
+const axios = require('axios');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -77,6 +78,28 @@ const adyenCheckPaymentInfo = async (sessionId, sessionResult, res) => {
 
 }
 
+const getGenesisOrgData = async (orgId, res) => {
+  try {
+      const username = process.env.GENESIS_USERNAME;
+      const password = process.env.GENESIS_PASSWORD;
+
+      // Create a base64-encoded string for Basic Authentication
+      const authString = Buffer.from(`${username}:${password}`).toString('base64');
+
+      const response =  await axios.get(`${process.env.GENESIS_URL}/v1/organizations/${orgId}`, {
+        headers: {
+          'Authorization': `Basic ${authString}`
+        }
+      });
+      console.log("response from genesis", response.data)
+      return res.status(200).json(response.data);
+    } catch (err) {
+      console.error(`Error: ${err.message}, error code: ${err.errorCode}`);
+      return res.status(err.statusCode || 500).json(err.message);
+    }
+
+}
+
 app.post('/api/sessions', async (req, res) => {
     return adyenCreatePaymentSession(req, res);
 });
@@ -88,6 +111,14 @@ app.get('/api/sessions/:sessionId', async (req, res) => {
   console.log("Session result", sessionResult);
   return adyenCheckPaymentInfo(sessionId, sessionResult, res);
 });
+
+app.get('/api/genesis-org/:genesisOrgId', async (req, res) => {
+  const orgId = req.params.genesisOrgId;
+  console.log("Org id", orgId);
+  return getGenesisOrgData(orgId, res);
+});
+
+
 
 
 app.listen(port, () => {

@@ -1,11 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 import AppContext from '../../appContext';
+import axios from 'axios';
 import { apiRoot, setAccessToken } from '../../commercetools';
 import CommercetoolsLogin from './commercetools-login';
 //import OktaLogin from './okta-login';
 //import DummyLogin from './dummy-login';
 
 const VERBOSE=true;
+
+
+export const fetchGenesisUser = async (genesisUserId) => {
+  const genesisUser = await axios.get(`${process.env.REACT_APP_URL_APP}/api/genesis-org/${genesisUserId}`);
+  return genesisUser.data;
+}
 
 const AccountPage = () => {
   const [context, setContext] = useContext(AppContext);
