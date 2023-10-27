@@ -148,6 +148,10 @@ export const addToCart = async (productId, variantId, custom) => {
   }
 
   if(cart) {
+    if (!cart.isTaxExempt && process.env.REACT_APP_AVALARA_READY  === "true") {
+      cart = await addTaxFields(cart.id || cart.body?.id, cart.version || cart.body.version);
+    }
+    console.log("addedTaxFields", cart);
     // add item to current cart
     console.log('Adding to current cart',cart.id,cart.version);
     if (!cart.shippingAddress?.city && process.env.REACT_APP_AVALARA_READY  === "true") {
@@ -229,6 +233,10 @@ export const addToCart = async (productId, variantId, custom) => {
         body: createCartBody
       })
       .execute();
+    if (!result.isTaxExempt && process.env.REACT_APP_AVALARA_READY  === "true") {
+        result = await addTaxFields(result.id || result.body.id, result.version || result.body?.version);
+      }
+      console.log("addedTaxFields", result);
     if (!result.shippingAddress?.city && process.env.REACT_APP_AVALARA_READY  === "true") {
       const customer = await getCustomer();
       result = await addAddress(customer, result.id || result.body?.id, result.version || result.body?.version);
@@ -307,6 +315,40 @@ const addGenesisOrgName = async (cartId, cartVersion) => {
             name: "selectedGenesisOrgName",
             value: process.env.REACT_APP_SELECTED_ORG_NAME
             }]
+        }
+      }).execute();
+}
+
+const addTaxFields = async (cartId, cartVersion) => {
+  console.log("addTaxFields", process.env.REACT_APP_SELECTED_ORG_NAME)
+  return await apiRoot
+      .me()
+      .carts()
+      .withId({ID: cartId})
+      .post({
+        body: {
+          version: cartVersion,
+          actions: [{
+            action: "setCustomField",
+            name: "isTaxExempt",
+            value: false
+            },
+            {
+              action: "setCustomField",
+              name: "taxExemptCertificate",
+              value: ""
+            },
+            {
+              action: "setCustomField",
+              name: "taxExemptReasonCode",
+              value: ""
+            },
+            {
+              action: "setCustomField",
+              name: "vatId",
+              value: ""
+            }
+          ]
         }
       }).execute();
 }
