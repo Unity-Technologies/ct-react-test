@@ -9,8 +9,6 @@ const OrderPage = () => {
 
   let [order, setOrder] = useState(null);
   let [fetched, setFetched] = useState(false);
-  
-  const paymentMethodId = sessionStorage.getItem('paymentMethodId');
 
   useEffect(() => {
     getCurrentOrder();
@@ -37,7 +35,7 @@ const OrderPage = () => {
       .execute();
     
     sessionStorage.removeItem('orderId');
-    sessionStorage.removeItem('paymentMethodId');
+    sessionStorage.removeItem('orderNumber');
 
     setOrder(null);
     setFetched(false)
@@ -47,22 +45,16 @@ const OrderPage = () => {
 
 
   const fetchOrder = async() => {
-    let orderId = sessionStorage.getItem('orderId');
+    const orderId = sessionStorage.getItem('orderId');
+    const orderNumber = sessionStorage.getItem('orderNumber');
 
     if(!orderId)
       return null;
 
-    let res = await apiRoot
-      .orders()
-      .withId({ID: orderId})
-      .get()
-      .execute();
-
-    if(res?.body) {
-      return res.body;
-    }
-
-    return null;
+    return {
+      id: orderId,
+      number: orderNumber
+    };
   }
   
   if(!order) {
@@ -86,13 +78,15 @@ const OrderPage = () => {
       <Container fluid>
         <Row>
           <Col>
-            <h4>Order</h4>{order.id}
-            <button onClick={deleteOrder}>Delete</button>
+            <h4>Order ID</h4>{order.id}
           </Col>
         </Row>
         <Row>
           <Col>
-            <h4>Payment method</h4>{paymentMethodId}
+            <h4>Order Number</h4>
+            {order.number}
+            <br/>
+            <button onClick={deleteOrder}>Delete</button>
           </Col>
         </Row> 
       </Container>         

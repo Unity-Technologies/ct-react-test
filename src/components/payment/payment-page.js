@@ -115,7 +115,8 @@ const AdyenForm = props => {
                   }
                   const createdOrder = createdOrderArray.results[0]
                   sessionStorage.removeItem("cartId");
-                  sessionStorage.setItem('orderId',createdOrder.id);
+                  sessionStorage.setItem('orderId', createdOrder.id);
+                  sessionStorage.setItem('orderNumber', createdOrder.orderNumber ? createdOrder.orderNumber : '');
                   props.history.push('/order');
                 }
               }
