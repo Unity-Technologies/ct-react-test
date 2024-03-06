@@ -195,7 +195,7 @@ export const addToCart = async (productId, variantId, custom) => {
     // Create cart and add item in one go. Save cart id
     let taxMode = "Platform";
     if(process.env.REACT_APP_AVALARA_READY  === "true") {
-      taxMode= "External"
+      taxMode= "ExternalAmount"
     }
     const createCartBody = {
       currency: currency,

@@ -61,7 +61,7 @@ const CartPage = props => {
     if(!cart) {
       return 0;
     }
-    console.log("totalTax", cart.taxedPrice)
+    console.log("totalTax", cart)
     total.centAmount = cart.taxedPrice?.totalTax?.centAmount || 0;
     return total;
   }
@@ -103,6 +103,15 @@ const CartPage = props => {
     const action = {
       action: 'addDiscountCode',
       code: discountCode
+    }
+    updateCartAndRefresh(action);
+  }
+
+  const addCustomerEmail = async () => {
+    const customerEmail=document.getElementById('customerEmail').value;
+    const action = {
+      action: 'setCustomerEmail',
+      email: customerEmail
     }
     updateCartAndRefresh(action);
   }
@@ -208,6 +217,8 @@ const CartPage = props => {
             <br/>version {cart.version}
             <br/>createdAt: { cart.createdAt}
             <br/>lastModifiedAt: { cart.lastModifiedAt }
+            <br/>customerEmail: { cart.customerEmail } 
+            <br/> <input id="customerEmail" type="text" placeholder="SetCustomerEmail"></input> <button onClick={addCustomerEmail}>Set</button>
           </Col>
         </Row>
       </Container>
