@@ -1,15 +1,13 @@
 // @ts-check
 
-import axios from 'axios';
-import React, { Component, useState } from "react";
-import { withRouter } from "react-router";
-import { useRef, useEffect } from 'react';
-import { getCart } from '../../util/cart-util';
-import { setAccessToken } from '../../commercetools';
 import AdyenCheckout from '@adyen/adyen-web';
 import '@adyen/adyen-web/dist/adyen.css';
-import { createPayment, addPaymentToCart, createSessionRequest, checkPayment, getCreatedOrderByCartId } from '../../util/payment-util';
+import React, { useEffect, useRef, useState } from "react";
 import { Col, Container, Row } from 'react-bootstrap';
+import { withRouter } from "react-router";
+import { setAccessToken } from '../../commercetools';
+import { getCart } from '../../util/cart-util';
+import { addPaymentToCart, checkPayment, createPayment, createSessionRequest, getCreatedOrderByCartId } from '../../util/payment-util';
 
 const URL_APP = 'http://localhost:3001';
 
@@ -88,7 +86,7 @@ const AdyenForm = props => {
         session: parsedSession,
         clientKey: process.env.REACT_APP_ADYEN_CLIENT_KEY, // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
         locale: 'en-US',
-        environment: 'test',
+        environment: process.env.REACT_APP_ENV === 'prd' ?  'live' : 'test',
         paymentMethodsResponse: parsedPaymentMethodsResponse,
         onPaymentCompleted: async (result, component) => {
           console.log("Session Data", parsedSession.id)
