@@ -10,7 +10,7 @@
     "@commercetools/sdk-client-v2": "2.1.2",
     "@okta/okta-auth-js": "4.7.2",
     "@okta/okta-react": "^4.1.0",
-    "axios": "^1.4.0",
+    "axios": "^1.20.0",
     "base-64": "^1.0.0",
     "body-parser": "^1.20.2",
     "bootstrap": "^4.6.0",
